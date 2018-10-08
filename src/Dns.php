@@ -53,7 +53,7 @@ class Dns
         $whoisInfo = $this->clean($this->dns->whois);
         unset($this->dns->whois);
 
-        $i = 0;
+        $counter = 0;
         foreach ($whoisInfo as $item) {
 
             $item = trim(strtolower($item));
@@ -62,12 +62,12 @@ class Dns
                 $this->dns->whois[] = $item;
             }
 
-            $this->getRegistrarName($item, $whoisInfo, $i);
+            $this->getRegistrarName($item, $whoisInfo, $counter);
             $this->getRegisteredDate($item);
             $this->getRenewalDate($item);
             $this->getExpiryDate($item);
 
-            $i++;
+            $counter++;
 
         }
 
