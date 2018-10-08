@@ -43,11 +43,11 @@ class Dns
 
         $this->dns->registrar = new \stdClass();
 
-        $whois = $this->clean($this->dns->whois);
+        $whoisInfo = $this->clean($this->dns->whois);
         unset($this->dns->whois);
 
         $i = 0;
-        foreach ($whois as $item) {
+        foreach ($whoisInfo as $item) {
 
             $item = trim(strtolower($item));
 
@@ -55,45 +55,10 @@ class Dns
                 $this->dns->whois[] = $item;
             }
 
-            if (preg_match('/registrar:(.*)/', $item, $result)) {
-
-                if ($result[1] != '') {
-                    $this->dns->registrar->name = trim($result[1]);
-                } else {
-                    $this->dns->registrar->name = trim($whois[$i + 1]);
-                }
-
-            }
-
-            if (preg_match('/registration date: (.*)/', $item, $result)) {
-
-                $this->dns->registrar->created = Carbon::parse(trim($result[1]));
-
-            }
-
-            if (preg_match('/registered on: (.*)/', $item, $result)) {
-
-                $this->dns->registrar->created = Carbon::parse(trim($result[1]));
-
-            }
-
-            if (preg_match('/creation date: (.*)/', $item, $result)) {
-
-                $this->dns->registrar->created = Carbon::parse(trim($result[1]));
-
-            }
-
-            if (preg_match('/renewal date:(.*)/', $item, $result)) {
-
-                $this->dns->registrar->expires = Carbon::parse(trim($result[1]));
-
-            }
-
-            if (preg_match('/expiry date:(.*)/', $item, $result)) {
-
-                $this->dns->registrar->expires = Carbon::parse(trim($result[1]));
-
-            }
+            $this->getRegistrarName($item, $whoisInfo, $i);
+            $this->getRegisteredDate($item);
+            $this->getRenewalDate($item);
+            $this->getExpiryDate($item);
 
             $i++;
 
@@ -107,6 +72,65 @@ class Dns
         $data = preg_replace('/\r/', '', $data);
 
         return $data;
+
+    }
+
+    private function getRegistrarName($item, $whoisInfo, $i)
+    {
+        if (preg_match('/registrar:(.*)/', $item, $result)) {
+
+            if ($result[1] != '') {
+
+                return $this->dns->registrar->name = trim($result[1]);
+
+            }
+
+            return $this->dns->registrar->name = trim($whoisInfo[$i + 1]);
+
+        }
+
+    }
+
+    private function getRegisteredDate($item){
+
+
+        if (preg_match('/registration date: (.*)/', $item, $result)) {
+
+            return $this->dns->registrar->created = Carbon::parse(trim($result[1]));
+
+        }
+
+        if (preg_match('/registered on: (.*)/', $item, $result)) {
+
+            return $this->dns->registrar->created = Carbon::parse(trim($result[1]));
+
+        }
+
+        if (preg_match('/creation date: (.*)/', $item, $result)) {
+
+            return $this->dns->registrar->created = Carbon::parse(trim($result[1]));
+
+        }
+
+    }
+
+    private function getRenewalDate($item){
+
+        if (preg_match('/renewal date:(.*)/', $item, $result)) {
+
+            return $this->dns->registrar->expires = Carbon::parse(trim($result[1]));
+
+        }
+
+    }
+
+    private function getExpiryDate($item){
+
+        if (preg_match('/expiry date:(.*)/', $item, $result)) {
+
+            return $this->dns->registrar->expires = Carbon::parse(trim($result[1]));
+
+        }
 
     }
 
