@@ -8,11 +8,18 @@ class Dns
 {
 
     protected $dns;
+    protected $carbon;
+
+    public function __construct()
+    {
+        $this->carbon = new Carbon();
+        $this->dns    = new \stdClass();
+    }
+
 
     public function analyze($domain)
     {
 
-        $this->dns        = new \stdClass();
         $this->dns->a     = dns_get_record($domain, DNS_A);
         $this->dns->ns    = dns_get_record($domain, DNS_NS);
         $this->dns->mx    = dns_get_record($domain, DNS_MX);
@@ -91,44 +98,47 @@ class Dns
 
     }
 
-    private function getRegisteredDate($item){
+    private function getRegisteredDate($item)
+    {
 
 
         if (preg_match('/registration date: (.*)/', $item, $result)) {
 
-            return $this->dns->registrar->created = Carbon::parse(trim($result[1]));
+            return $this->dns->registrar->created = $this->carbon->parse(trim($result[1]));
 
         }
 
         if (preg_match('/registered on: (.*)/', $item, $result)) {
 
-            return $this->dns->registrar->created = Carbon::parse(trim($result[1]));
+            return $this->dns->registrar->created = $this->carbon->parse(trim($result[1]));
 
         }
 
         if (preg_match('/creation date: (.*)/', $item, $result)) {
 
-            return $this->dns->registrar->created = Carbon::parse(trim($result[1]));
+            return $this->dns->registrar->created = $this->carbon->parse(trim($result[1]));
 
         }
 
     }
 
-    private function getRenewalDate($item){
+    private function getRenewalDate($item)
+    {
 
         if (preg_match('/renewal date:(.*)/', $item, $result)) {
 
-            return $this->dns->registrar->expires = Carbon::parse(trim($result[1]));
+            return $this->dns->registrar->expires = $this->carbon->parse(trim($result[1]));
 
         }
 
     }
 
-    private function getExpiryDate($item){
+    private function getExpiryDate($item)
+    {
 
         if (preg_match('/expiry date:(.*)/', $item, $result)) {
 
-            return $this->dns->registrar->expires = Carbon::parse(trim($result[1]));
+            return $this->dns->registrar->expires = $this->carbon->parse(trim($result[1]));
 
         }
 
